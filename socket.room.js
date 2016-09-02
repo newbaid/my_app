@@ -24,8 +24,7 @@ io.sockets.on( 'connection', function(socket){
 		socket.room = data;
 	});
 
-	socket.on( 'message', function(data){
-
+	socket.on( 'message', function(data){		
 		console.log( 'id : %s, msg : %s, date : %s', data.id, data.message, data.date );
 		io.sockets.in( socket.room ).emit('message', data);
 	});

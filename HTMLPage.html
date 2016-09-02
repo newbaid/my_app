@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mobile Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js">
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      $(document).ready(function (){
+        var socket = io.connect();
+
+        socket.on('message', function (data){
+
+          var output = '';
+          output += '<li>';
+          output += ' <h3>' + data.name + '</h3>';
+          output += ' <p>' + data.message + '</p>';
+          output += ' <p>' + data.reg_date + '</p>';
+          output += '</li>';
+
+          $(output).prependTo('#content');
+          $('#content').listview('refresh');
+        });
+
+        $('button').click(function () {
+          socket.emit('message', {
+            name: $('#name').val(),
+            message: $('#message').val(),
+            reg_date: new Date().toUTCString()
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div data-role="page">
+      <div data-role="header">
+        <h1>Socket.io Chat</h1>
+      </div>
+      <div data-role="content">
+        <h3>Nick Name</h3>
+        <input id="name" />
+        <a data-role="button" href="#chatpage">Start Chat</a>
+      </div>
+    </div>
+  <div data-role="page" id="chatpage">
+    <div data-role="header">
+      <h1>Socket.io Chat</h1>
+    </div>
+    <div data-role="content">
+      <input id="message" />
+      <button>Button</button>
+      <ul id="content" data-role="listview" data-inset="true">
+      </ul>
+    </div>
+  </div>
+  </body>
+</html>

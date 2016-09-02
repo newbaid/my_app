@@ -1,30 +1,28 @@
-var express = require('express');
-var path = require('path');
-var app = express();
+var http = require('http');
+var fs = require('fs');
+var socketio = require('socket.io');
+var mysql = require('mysql');
 
-app.set('view engine', 'ejs');
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-var data={count:0};
-
-app.get('/', function (req,res){
-  data.count++;
-  res.render('my_first_ejs',data);
-});
-app.get('/reset', function (req,res){
-  data.count=0;
-  res.render('my_first_ejs',data);
-});
-app.get('/set/count', function (req,res){
-  if(req.query.count) data.count=req.query.count;
-  res.render('my_first_ejs',data);
-});
-app.get('/set/:num', function (req,res){
-  data.count=req.params.num;
-  res.render('my_first_ejs',data);
+var client = mysql.createConnection({
+  user: 'root',
+  password: '1234',
+  database: 'node'
 });
 
-app.listen(3000, function(){
-  console.log('Server On!');
+var server = http.createServer(function (request, response){
+  fs.readFile('HTMLPage.html', function (error, data){
+    response.writeHead(200, { 'Content-Type': 'text/html'});
+    response.end(data);
+  });
+}).listen(52273, function () {
+  console.log('Server Running at http://127.0.0.1:52273');
+});
+
+
+var io = require('socket.io').listen(server);
+io.sockets.on('connection', function (socket){
+  socket.on('message', function (data) {
+    client.query('INSERT INTO chat (name, message) VALUES (?, ?)', [ data.name, data.message ]);
+    io.sockets.emit('message', data);
+  });
 });

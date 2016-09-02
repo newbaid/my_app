@@ -1,0 +1,10 @@
+var login = require("facebook-chat-api");
+ 
+login({email: "newbaid@naver.com", password: "djswpsk1@@"}, function callback (err, api) {
+    if(err) return console.error(err);
+ 
+    var yourID = "newbaid@naver";
+    var msg = {body: "Hey!"};
+    api.sendMessage(msg, yourID);
+});
+
